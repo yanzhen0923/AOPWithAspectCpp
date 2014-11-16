@@ -1,0 +1,15 @@
+del aims.tmp
+del appeartimes.tmp
+del beinvokedcondition.tmp
+del coverage.ah
+del cutTheTree.exe
+del functions.tmp
+del invokecondition.tmp
+del main.exe
+del mycoverage.ah
+del nouse.tmp
+del one.exe
+del res.xml
+del strongre.tmp
+del tree.tmp
+del clear.bat

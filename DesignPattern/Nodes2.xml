@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Node Name="root">
+	<Children>
+		<Node Name="two">
+			<Children>
+				<Node Name="zizi"/>
+			</Children>
+		</Node>
+		<Node Name="haha"/>
+	</Children>
+</Node>
+

@@ -1,0 +1,102 @@
+#ifndef __coverage_ah__
+#define __coverage_ah__
+
+#include <iostream>
+#include <string>
+#include <stdio.h>
+using namespace std;
+
+// Implementation of a generic coveragemonitor that does not only
+// count how often a function is executed, but also which functions
+// are not executed.
+
+namespace coveragemonitor {
+  // data structure used to gather information about a joinpoint
+  struct Data {
+    unsigned _calls;
+    const char *(*_sig)();
+  };
+
+  // data structure used to link the joinpoint data elements
+  struct Chain {
+    static Chain *&first () { static Chain *chain = 0; return chain; }
+    Data *_data;
+    Chain *_next;
+    Chain (Data *data) : _data (data) {
+      Chain *head = first ();
+      first () = this;
+      _next = head;
+    }
+  };
+
+  // data structure used to combine data and chain elements
+  template <const char *(*SIG)()>
+  struct Collector {
+    static Data _data;
+    static Chain _chain;
+  };
+
+  template <const char *(*SIG)()> Data Collector<SIG>::_data = { 0, SIG };
+  template <const char *(*SIG)()> Chain Collector<SIG>::_chain (&_data);
+
+}
+
+
+aspect GenericCoverageAspect {
+  // Do not measure the coverage aspect's own methods
+  pointcut dontMeasure () = "% coveragemonitor::...::%(...)";
+
+  // Specify this joinpoint to define the functions you are
+  // interested in.
+  pointcut virtual coverage() = 0;
+
+  advice execution ("% main(...)") :before(){
+	freopen("tree.tmp","w",stdout);
+	freopen("CON","w",stdout);
+  }
+  advice execution (coverage() && !dontMeasure()) : before() {
+    using namespace coveragemonitor;
+    typedef Collector<&JoinPoint::signature> Collector;
+	freopen("tree.tmp","a",stdout);
+	std::cout << Collector::_chain._data->_sig() << " 1" << endl;
+	freopen("CON","w",stdout);
+    Collector::_chain._data->_calls++;
+  }
+
+  // Print the resulting information.
+  advice execution (coverage() && !dontMeasure()) : after () {
+     using namespace coveragemonitor;
+    typedef Collector<&JoinPoint::signature> Collector;
+	string name = Collector::_chain._data->_sig();
+	freopen("tree.tmp","a",stdout);
+	if(name.find("main(") == name.npos)cout << name << " 0" << endl;
+	freopen("CON","w",stdout);
+  }
+
+  advice execution ("% main(...)") :after(){
+	using namespace coveragemonitor;
+    typedef Collector<&JoinPoint::signature> Collector;
+	freopen("tree.tmp","a",stdout);
+	cout << Collector::_chain._data->_sig() << " 0" << endl;
+	freopen("CON","w",stdout);
+	freopen("functions.tmp","w",stdout);
+	for (coveragemonitor::Chain *curr = coveragemonitor::Chain::first();
+	 curr; curr = curr->_next) {
+     if(curr->_data->_calls != 0) cout << curr->_data->_sig() << endl;
+    }
+	freopen("aims.tmp","w",stdout);
+	for (coveragemonitor::Chain *curr = coveragemonitor::Chain::first();
+	 curr; curr = curr->_next) {
+      cout << curr->_data->_sig() << endl;
+    }
+	freopen("nouse.tmp","w",stdout);
+	for (coveragemonitor::Chain *curr = coveragemonitor::Chain::first();
+	 curr; curr = curr->_next) {
+      if(curr->_data->_calls == 0) cout << curr->_data->_sig() << endl;
+    }
+
+  }
+};
+
+
+#endif
