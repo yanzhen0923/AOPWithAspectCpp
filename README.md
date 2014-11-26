@@ -8,7 +8,7 @@ http://www.mingw.org/
 http://www.aspectc.org/
 
 This is my assignment on the course Software Architecture & Design Patterns, so the project name is "Design Pattern", but name has nothing to do with the code.
-Using the tool called Aspect C++, the project could generate a tree in terms of the invoking relations of the functions in a C++ project, and help with AOP(Currently only the console verion C++ project is supported).
+Using the tool called Aspect C++, the project could generate a tree in terms of the invoking relations of the functions in a C++ project, and help with AOP(Aspect Oriented Programming).Currently only the console verion C++ project is supported.
 Please make sure that the g++ and the Aspect C++ is installed on windows. If there are proper outputs if you type "g++" and "ac++" on a cmd window in windows, that means the installation is successful.
 For more details, please reference
 http://www.mingw.org/
